@@ -62,6 +62,41 @@ docs/
 | Testing | pytest |
 | Types | mypy |
 
+## TODO — Remaining Work
+
+### Priority 1: Make Pipeline Runnable (2-3 hours)
+
+- [ ] **API key wiring**: Replace `NotImplementedError` in `address_matcher.py` and `anomaly_detector.py` with actual Anthropic API calls (10 lines each, format already documented in comments)
+- [ ] **Sample data**: Create `data/samples/raw_sample.csv` with 100-500 anonymized rows. Use the 8 representative fields from `config/sample.yaml`. Anonymization: addresses → generic labels, coordinates → 3 decimal places
+- [ ] **Stage 1 rule engine modules**: Extract validated logic from cesium-mvp into standalone Python modules:
+  - [ ] `src/rule_engine/header_detector.py` — 3-mode detection (double-row / prefix / flat)
+  - [ ] `src/rule_engine/type_inference.py` — 9-type auto-detection with boolean normalization
+  - [ ] `src/rule_engine/empty_strategy.py` — drop / fill_mode / keep
+  - [ ] `src/rule_engine/coord_converter.py` — GCJ-02 ↔ WGS-84 ↔ BD-09
+  - [ ] `src/rule_engine/geojson_cleaner.py` — topology repair + degenerate fragment removal
+- [ ] **Wire `_run_stage1/2/3` in `pipeline.py`** to actually call the modules above
+- [ ] **Report generation**: `src/report/generate.py` — Markdown report with before/after stats + Agent findings
+
+### Priority 2: Polish (2-3 hours)
+
+- [ ] `requirements.txt` with exact versions (pandas, geopandas, pyyaml, anthropic, pytest)
+- [ ] `Makefile` with targets: `make run`, `make test`, `make clean`
+- [ ] pytest tests for stage 1 modules (happy path + edge cases)
+- [ ] `docs/` with architecture diagram + data flow description
+- [ ] Demo GIF/screenshot in README of pipeline running end-to-end
+
+### Priority 3: Agent Enhancement (future)
+
+- [ ] Agent 3 audit: batch sampling with confidence scores + human review queue
+- [ ] Few-shot examples in prompts from real matching history
+- [ ] Streaming output for large batch processing
+
+### What NOT to do
+
+- Do NOT add LangChain/LlamaIndex — overkill for 2 Agent calls, adds dependency weight
+- Do NOT make a web UI — CLI is sufficient for showcase
+- Do NOT handle every edge case — this is a showcase, not production software
+
 ## Related Repos
 
 - `kashgar-urban-digital-twin` — The 3D platform this data pipeline was built for (full source)
