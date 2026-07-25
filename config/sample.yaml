@@ -1,0 +1,76 @@
+# ── Data Cleaning Pipeline Configuration ──
+# Each data source can have its own config file.
+# This sample is based on the 25K-building urban survey dataset.
+
+source: "community_survey_2026"
+input: "data/samples/raw_sample.csv"
+output_dir: "data/clean"
+
+# ── Stage 1: Rule Engine ──
+
+field_mapping:
+  # Source field → standardized field name
+  "房号": "room_id"
+  "户号": "household_id"
+  "建筑结构": "structure_type"
+  "建造年代": "build_year"
+  "层数": "floor_count"
+  "建筑面积": "area_m2"
+  "地址": "address"
+  # ... (66 fields in production, shown here with 8 for the sample)
+
+type_rules:
+  structure_type: "string"
+  floor_count: "int"
+  build_year: "int"
+  area_m2: "float"
+  address: "string"
+
+empty_strategy:
+  # Per-field strategy for empty/null values
+  structure_type: "fill_mode"     # Fill with most common value
+  floor_count: "keep"             # 0 is meaningful (single-story)
+  build_year: "drop"              # Can't infer year
+  remarks: "drop"                 # Completely empty field — remove column
+  address: "keep"                 # Needed for Agent stage
+
+coord_conversion:
+  enabled: true
+  columns: ["longitude", "latitude"]
+  source: "GCJ-02"                # Common in Chinese government data
+  target: "WGS-84"                # Cesium / international standard
+
+dedup:
+  enabled: true
+  match_columns: ["address", "structure_type", "floor_count"]
+  strategy: "keep_first"          # keep_first | keep_longest | merge
+
+# ── Stage 2: Agent Assist ──
+
+agent:
+  enabled: true
+  model: "claude-fable-5"
+  modules:
+    address_matcher:
+      enabled: true
+      threshold: 0.8               # Min confidence to auto-accept match
+      prompt_file: "config/prompts/address_matcher.txt"
+    anomaly_detector:
+      enabled: true
+      sample_size: 50              # Rows to sample for batch analysis
+      prompt_file: "config/prompts/anomaly_detector.txt"
+
+# ── Stage 3: Agent Audit ──
+
+audit:
+  enabled: true
+  model: "claude-fable-5"
+  sample_size: 100                 # Rows to audit
+  confidence_threshold: 0.7        # Below this → human review queue
+
+# ── Report ──
+
+report:
+  format: "markdown"               # markdown | html
+  include_stats: true
+  include_agent_findings: true

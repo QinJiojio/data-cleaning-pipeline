@@ -41,12 +41,12 @@ Stage 1: Rule Engine              Stage 2: Agent Assist            Stage 3: Agen
 
 ## Features
 
-- [x] **Stage 1 — Rule Engine**: field name mapping, type inference (int/float/date/boolean), coordinate conversion (GCJ-02 ↔ WGS-84), regex dedup, empty value strategies (drop/fill/keep)
-- [ ] **Stage 2 — Agent Assist**: LLM-powered address fuzzy matching, value equivalence judgment, anomaly reasoning with domain knowledge
+- [x] **Stage 1 — Rule Engine**: field name mapping, type inference (9 types), coordinate conversion (GCJ-02 ↔ WGS-84), regex dedup, empty value strategies (drop/fill/keep)
+- [x] **Stage 2 — Agent Assist**: address semantic matching (LLM judges fuzzy address equivalence) + anomaly pattern reasoning (LLM flags impossible data combos using domain knowledge)
 - [ ] **Stage 3 — Agent Audit**: batch sampling → LLM review → anomaly report with confidence scores → human review queue
 - [x] YAML-driven configuration — different data sources use different rules, no code changes needed
-- [x] Checkpoint files at each stage — pipeline can resume or re-run individual stages
-- [x] Cleaning report generation — input vs output comparison, anomaly counts, per-field statistics
+- [x] Prompt templates in `config/prompts/` — auditable, version-controlled AI instructions
+- [x] Pipeline orchestrator with checkpoint support — resume from any stage
 
 ## Quick Start
 
