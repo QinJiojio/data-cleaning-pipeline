@@ -101,3 +101,12 @@ docs/
 
 - `kashgar-urban-digital-twin` — The 3D platform this data pipeline was built for (full source)
 - `cesium-mvp` — Private production repo (not public)
+
+
+## 跨机同步仓库声明（2026-11-21）
+
+- 本仓库是**跨机同步仓库**：远端 `github.com/QinJiojio/data-cleaning-pipeline`，A/B 两机各持一份 clone（路径一致协议，禁止改名/移动）
+- **开工**：`git pull`；若 `git log @{u}..HEAD` 非空先补推上次遗漏
+- **收工**：commit + push 并**确认 push 成功**（失败=改动未送达，下次会话补推）；提交信息用 `<类型>:<中文摘要>`（feat/fix/docs/chore/wip）
+- 冲突保留双方条目，不确定即停问用户；**禁止 force push**
+- 纪律全文见 `_galaxia` 仓库（CLAUDE.md 通信协议 + 指导书 §3.6）
